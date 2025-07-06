@@ -1,27 +1,6 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { getEntryBySlug, getCollection } from "astro:content";
-import { Astro } from "astro";
-
-// ✅ Add this: Tell Astro which blog slugs to pre-render
-export async function getStaticPaths() {
-  const posts = await getCollection("blog");
-  return posts.map((post) => ({
-    params: { slug: post.slug },
-  }));
-}
-
-// ✅ This part was already correct:
-const { slug } = Astro.params;
-const post = await getEntryBySlug("blog", slug);
-
-if (!post) {
-  throw new Error(`Post not found for slug: ${slug}`);
-}
-------
-import Layout from "../../layouts/Layout.astro";
 import { getEntryBySlug } from "astro:content";
-import { Astro } from "astro";
 
 const { slug } = Astro.params;
 const post = await getEntryBySlug("blog", slug);
