@@ -1,12 +1,21 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { getEntryBySlug } from "astro:content";
+import { getEntryBySlug, getCollection } from "astro:content";
 
-const { slug } = Astro.params;
-const post = await getEntryBySlug("blog", slug);
+// 👇 Required for dynamic routing — tells Astro which slugs to build
+export async function getStaticPaths() {
+  const posts = await getCollection("blog");
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+// Astro gives us the `post` as a prop from getStaticPaths
+const { post } = Astro.props;
 
 if (!post) {
-  throw new Error(`Post not found for slug: ${slug}`);
+  throw new Error(`Post not found for slug`);
 }
 ---
 
