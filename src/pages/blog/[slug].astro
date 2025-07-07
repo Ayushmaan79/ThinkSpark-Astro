@@ -1,22 +1,12 @@
 ---
-import Markdown from "@astrojs/markdown-remark";
 import Layout from "../../layouts/Layout.astro";
-import { getEntryBySlug, getCollection } from "astro:content";
+import { getEntryBySlug } from "astro:content";
 
-// 👇 Required for dynamic routing — tells Astro which slugs to build
-export async function getStaticPaths() {
-  const posts = await getCollection("blog");
-  return posts.map((post) => ({
-    params: { slug: post.slug },
-    props: { post },
-  }));
-}
-
-// Astro gives us the `post` as a prop from getStaticPaths
-const { post } = Astro.props;
+const { slug } = Astro.params;
+const post = await getEntryBySlug("blog", slug);
 
 if (!post) {
-  throw new Error(`Post not found for slug`);
+  throw new Error(`Post not found for slug: ${slug}`);
 }
 ---
 
@@ -25,6 +15,8 @@ if (!post) {
     <h1 class="text-3xl font-bold mb-2">{post.data.title}</h1>
     <p class="text-sm text-gray-400 mb-6">{new Date(post.data.date).toLocaleDateString()}</p>
     <p class="text-lg text-gray-300 mb-6">{post.data.description}</p>
-    <Markdown>{post.body}</Markdown>
+
+    <!-- ✅ Renders the actual blog post content -->
+    <post.render />
   </article>
 </Layout>
