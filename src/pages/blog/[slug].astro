@@ -1,6 +1,6 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { getEntryBySlug } from "astro:content";
+import { getEntryBySlug, getCollection } from "astro:content";
 
 const { slug } = Astro.params;
 const post = await getEntryBySlug("blog", slug);
@@ -8,15 +8,22 @@ const post = await getEntryBySlug("blog", slug);
 if (!post) {
   throw new Error(`Post not found for slug: ${slug}`);
 }
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog");
+  return posts.map((post) => ({
+    params: { slug: post.slug }
+  }));
+}
 ---
 
 <Layout title={post.data.title}>
   <article class="prose prose-invert max-w-2xl mx-auto">
     <h1 class="text-3xl font-bold mb-2">{post.data.title}</h1>
-    <p class="text-sm text-gray-400 mb-6">{new Date(post.data.date).toLocaleDateString()}</p>
+    <p class="text-sm text-gray-400 mb-6">
+      {new Date(post.data.date).toLocaleDateString()}
+    </p>
     <p class="text-lg text-gray-300 mb-6">{post.data.description}</p>
-
-    <!-- ✅ Renders the actual blog post content -->
     <post.render />
   </article>
 </Layout>
